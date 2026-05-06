@@ -1,0 +1,48 @@
+import streamlit as st
+
+st.set_page_config(page_title="Pescador Pro Spain", page_icon="🎣")
+
+st.title("🏆 Pescador Pro: Match Tracker")
+st.markdown("### *Control de Pesaje en Tiempo Real*")
+
+# Spanish Venues Dropdown
+venues_es = [
+    "Embalse de Orellana", "Embalse de Sierra Brava", 
+    "Río Ebro (Caspe)", "Río Júcar (Fortaleny)", 
+    "Embalse de García de Sola", "Embalse de Arcos"
+]
+
+venue = st.selectbox("Seleccionar Escenario:", venues_es)
+peg = st.number_input("Puesto / Peg:", min_value=1, step=1)
+
+# Metric Catch Logger (Kilos and Grams)
+if 'total_kg' not in st.session_state:
+    st.session_state.total_kg = 0.0
+
+st.subheader(f"Registro: Puesto {peg}")
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    if st.button("➕ 1.0 kg (Carp)"):
+        st.session_state.total_kg += 1.0
+with col2:
+    if st.button("➕ 2.5 kg (Barbo)"):
+        st.session_state.total_kg += 2.5
+with col3:
+    if st.button("➕ 100g (Alburno)"):
+        st.session_state.total_kg += 0.100
+
+# Display Metric
+st.metric("Peso Total Estimado", f"{st.session_state.total_kg:.3f} kg")
+
+# Spanish Competition Rules: Net Limits
+# Common in Spain to have a 20kg or 25kg limit per net
+net_limit = 20.0 
+current_net_weight = st.session_state.total_kg % net_limit
+
+if current_net_weight > (net_limit - 2.0):
+    st.warning(f"⚠️ ¡Cuidado! Red casi llena. Tienes {current_net_weight:.2f}kg.")
+
+if st.button("Finalizar y Guardar Pesaje"):
+    st.balloons()
+    st.success(f"Registrado: {st.session_state.total_kg:.3f}kg en {venue}")
